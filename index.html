@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Página Personal</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <h1>¡Hola! Soy Rodney</h1>
+        <p>Esta es mi página personal creada para practicar Git y GitHub</p>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="#sobre-mi">Sobre mí</a></li>
+            <li><a href="#proyectos">Proyectos</a></li>
+            <li><a href="#contacto">Contacto</a></li>
+        </ul>
+    </nav>
+
+    <section id="sobre-mi">
+        <h2>Sobre mí</h2>
+        <p>Soy un estudiante apasionado por la tecnología, el desarrollo web y el aprendizaje continuo.</p>
+    </section>
+
+    <section id="proyectos">
+        <h2>Proyectos</h2>
+        <ul id="lista-proyectos">
+            <!-- Se agregan proyectos con JS -->
+        </ul>
+        <button onclick="agregarProyecto()">Agregar proyecto</button>
+    </section>
+
+    <section id="contacto">
+        <h2>Contacto</h2>
+        <form>
+            <input type="text" placeholder="Tu nombre" required>
+            <input type="email" placeholder="Tu correo" required>
+            <textarea placeholder="Tu mensaje"></textarea>
+            <button type="submit">Enviar</button>
+        </form>
+    </section>
+
+    <script src="script.js"></script>
+</body>
+</html>
