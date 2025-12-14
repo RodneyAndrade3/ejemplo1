@@ -3,17 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mi Página Personal</title>
+    <title>Rodney Andrade | Página Personal</title>
+    <meta name="description" content="Página personal de Rodney Andrade para practicar Git y GitHub">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <header>
-        <h1>¡Hola! Soy Rodney</h1>
-        <p>Esta es mi página personal creada para practicar Git y GitHub</p>
+    <!-- ENCABEZADO -->
+    <header class="header">
+        <h1>👋 Hola, soy Rodney</h1>
+        <p>Estudiante apasionado por la tecnología y el desarrollo web</p>
     </header>
 
-    <nav>
+    <!-- NAVEGACIÓN -->
+    <nav class="nav">
         <ul>
             <li><a href="#sobre-mi">Sobre mí</a></li>
             <li><a href="#proyectos">Proyectos</a></li>
@@ -21,31 +24,54 @@
         </ul>
     </nav>
 
-    <section id="sobre-mi">
-        <h2>Sobre mí</h2>
-        <p>Soy un estudiante apasionado por la tecnología, el desarrollo web y el aprendizaje continuo y me gusta el futbol y
-            jugar cuarenta
+    <!-- CONTENIDO PRINCIPAL -->
+    <main>
+        <!-- SOBRE MÍ -->
+        <section id="sobre-mi" class="section">
+            <h2>Sobre mí</h2>
+            <p>
+                Soy estudiante de Ingeniería de Sistemas, me gusta el desarrollo web,
+                aprender nuevas tecnologías y mejorar mis habilidades cada día.
+                En mi tiempo libre disfruto jugar fútbol y el juego de cartas <strong>Cuarenta</strong>.
             </p>
-    </section>
+        </section>
 
-    <section id="proyectos">
-        <h2>Proyectos</h2>
-        <ul id="lista-proyectos">
-            <!-- Se agregan proyectos con JS -->
-        </ul>
-        <button onclick="agregarProyecto()">Agregar proyecto</button>
-    </section>
+        <!-- PROYECTOS -->
+        <section id="proyectos" class="section">
+            <h2>Proyectos</h2>
+            <ul id="lista-proyectos" class="proyectos-lista">
+                <!-- Proyectos agregados con JavaScript -->
+            </ul>
+            <button class="btn" onclick="agregarProyecto()">➕ Agregar proyecto</button>
+        </section>
 
-    <section id="contacto">
-        <h2>Contacto</h2>
-        <form>
-            <input type="text" placeholder="Tu nombre" required>
-            <input type="email" placeholder="Tu correo" required>
-            <textarea placeholder="Tu mensaje"></textarea>
-            <button type="submit">Enviar</button>
-        </form>
-    </section>
+        <!-- CONTACTO -->
+        <section id="contacto" class="section">
+            <h2>Contacto</h2>
+            <form class="formulario">
+                <label>
+                    Nombre
+                    <input type="text" placeholder="Tu nombre" required>
+                </label>
+                <label>
+                    Correo
+                    <input type="email" placeholder="Tu correo" required>
+                </label>
+                <label>
+                    Mensaje
+                    <textarea placeholder="Tu mensaje" rows="4"></textarea>
+                </label>
+                <button type="submit" class="btn">📨 Enviar</button>
+            </form>
+        </section>
+    </main>
+
+    <!-- PIE DE PÁGINA -->
+    <footer class="footer">
+        <p>© 2025 Rodney Andrade | Practicando Git & GitHub</p>
+    </footer>
 
     <script src="script.js"></script>
 </body>
 </html>
+
