@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <a href="#main-content" class="skip-link">Saltar al contenido principal</a>
 
     <!-- ENCABEZADO -->
     <header class="header">
@@ -26,7 +27,7 @@
     </nav>
 
     <!-- CONTENIDO PRINCIPAL -->
-    <main>
+    <main id="main-content">
         <!-- SOBRE MÍ -->
         <section id="sobre-mi" class="section">
             <h2>Sobre mí</h2>
@@ -59,20 +60,23 @@
         <!-- CONTACTO -->
         <section id="contacto" class="section">
             <h2>Contacto</h2>
-            <form class="formulario">
-                <label>
-                    Nombre
-                    <input type="text" placeholder="Tu nombre" required>
-                </label>
-                <label>
-                    Correo
-                    <input type="email" placeholder="Tu correo" required>
-                </label>
-                <label>
-                    Mensaje
-                    <textarea placeholder="Tu mensaje" rows="4"></textarea>
-                </label>
-                <button type="submit" class="btn">📨 Enviar</button>
+            <form class="formulario" action="#" method="post">
+                <fieldset>
+                    <legend>Envíame un mensaje</legend>
+                    <label for="nombre">
+                        Nombre
+                        <input id="nombre" type="text" placeholder="Tu nombre" required>
+                    </label>
+                    <label for="correo">
+                        Correo
+                        <input id="correo" type="email" placeholder="Tu correo" required>
+                    </label>
+                    <label for="mensaje">
+                        Mensaje
+                        <textarea id="mensaje" placeholder="Tu mensaje" rows="4"></textarea>
+                    </label>
+                    <button type="submit" class="btn">📨 Enviar</button>
+                </fieldset>
             </form>
         </section>
     </main>
