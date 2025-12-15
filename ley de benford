@@ -1,0 +1,319 @@
+"""
+Analizador de Ley de Benford para datos de seguidores de Instagram
+Genera gráficos y análisis estadísticos
+"""
+
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+import math
+import os
+from pathlib import Path
+
+class BenfordAnalyzer:
+    """
+    Clase para analizar datos de seguidores según la Ley de Benford
+    """
+    
+    def __init__(self, csv_file=None):
+        """
+        Inicializa el analizador
+        Args:
+            csv_file: Ruta al archivo CSV (opcional, se puede cargar después)
+        """
+        self.csv_file = csv_file
+        self.dataset = None
+        self.primeros_digitos = []
+        self.frecuencias_reales = []
+        self.porcentajes_reales = []
+        self.porcentajes_benford = []
+        
+    def load_csv(self, csv_file):
+        """Carga un archivo CSV"""
+        try:
+            self.csv_file = csv_file
+            self.dataset = pd.read_csv(csv_file)
+            print(f"✓ Archivo cargado: {csv_file}")
+            return True
+        except Exception as e:
+            print(f"❌ Error al cargar archivo: {e}")
+            return False
+    
+    def select_csv_file(self):
+        """Abre un diálogo para seleccionar archivo CSV"""
+        try:
+            import tkinter as tk
+            from tkinter import filedialog
+            
+            root = tk.Tk()
+            root.withdraw()
+            
+            file_path = filedialog.askopenfilename(
+                title="Selecciona el archivo CSV de estadísticas",
+                filetypes=(("Archivos CSV", "*.csv"), ("Todos los archivos", "*.*"))
+            )
+            
+            if file_path:
+                return self.load_csv(file_path)
+            else:
+                print("⚠️ No se seleccionó ningún archivo")
+                return False
+                
+        except ImportError:
+            print("❌ tkinter no está disponible")
+            return False
+    
+    def extract_first_digits(self):
+        """Extrae los primeros dígitos de la columna First_Digit"""
+        if self.dataset is None:
+            print("❌ No hay datos cargados")
+            return False
+        
+        try:
+            # Usar columna First_Digit directamente
+            if "First_Digit" in self.dataset.columns:
+                self.primeros_digitos = self.dataset["First_Digit"].dropna().astype(int).tolist()
+            else:
+                print("❌ No se encontró columna 'First_Digit'")
+                return False
+            
+            print(f"✓ Extraídos {len(self.primeros_digitos)} primeros dígitos")
+            return True
+            
+        except Exception as e:
+            print(f"❌ Error extrayendo dígitos: {e}")
+            return False
+    
+    def calculate_statistics(self):
+        """Calcula frecuencias y porcentajes"""
+        if not self.primeros_digitos:
+            print("❌ No hay dígitos para analizar")
+            return False
+        
+        try:
+            # Frecuencias reales
+            total = len(self.primeros_digitos)
+            self.frecuencias_reales = [self.primeros_digitos.count(d) for d in range(1, 10)]
+            self.porcentajes_reales = [(f / total) * 100 for f in self.frecuencias_reales]
+            
+            # Ley de Benford (teórica)
+            self.porcentajes_benford = [(math.log10(1 + 1/d)) * 100 for d in range(1, 10)]
+            
+            print("✓ Estadísticas calculadas")
+            return True
+            
+        except Exception as e:
+            print(f"❌ Error calculando estadísticas: {e}")
+            return False
+    
+    def generate_plot(self, output_file=None, show=True):
+        """
+        Genera el gráfico de análisis de Benford
+        Args:
+            output_file: Ruta donde guardar el gráfico (opcional)
+            show: Si True, muestra el gráfico en pantalla
+        """
+        if not self.porcentajes_reales:
+            print("❌ No hay estadísticas calculadas")
+            return False
+        
+        try:
+            digitos = np.arange(1, 10)
+            
+            # Crear figura
+            plt.figure(figsize=(14, 6))
+            
+            # Barras para datos reales
+            plt.bar(digitos, self.porcentajes_reales, alpha=0.6, 
+                   label="Datos reales: Num_Followers", color='skyblue')
+            
+            # Curva de Benford
+            plt.plot(digitos, self.porcentajes_benford, marker="o", linestyle="-", 
+                    color="red", linewidth=2, markersize=8, label="Ley de Benford (teórica)")
+            
+            # Línea de porcentaje real
+            plt.plot(digitos, self.porcentajes_reales, marker="o", linestyle="-", 
+                    color="black", linewidth=2, markersize=8, label="Porcentaje real")
+            
+            # Agregar porcentaje encima de cada barra
+            for i, valor in enumerate(self.porcentajes_reales):
+                plt.text(digitos[i], valor + 0.8, f"{valor:.2f}%", 
+                        ha='center', va='bottom', fontsize=9, color='blue', fontweight='bold')
+            
+            # Configuración del gráfico
+            plt.xticks(digitos)
+            plt.xlabel("Primer dígito", fontsize=12, fontweight='bold')
+            plt.ylabel("Porcentaje (%)", fontsize=12, fontweight='bold')
+            plt.title("Ley de Benford aplicada a número de seguidores", 
+                     fontsize=14, fontweight='bold')
+            plt.legend(fontsize=10, loc='upper left')
+            plt.grid(True, alpha=0.3)
+            
+            # Crear tabla
+            tabla_data = []
+            for i in range(9):
+                tabla_data.append([
+                    digitos[i],
+                    self.frecuencias_reales[i],
+                    f"{self.porcentajes_reales[i]:.2f}%",
+                    f"{self.porcentajes_benford[i]:.2f}%"
+                ])
+            
+            # Fila Total
+            total_frecuencia = sum(self.frecuencias_reales)
+            total_porcentaje_real = sum(self.porcentajes_reales)
+            total_porcentaje_benford = sum(self.porcentajes_benford)
+            
+            tabla_data.append([
+                "Total",
+                total_frecuencia,
+                f"{total_porcentaje_real:.2f}%",
+                f"{total_porcentaje_benford:.2f}%"
+            ])
+            
+            # Añadir tabla
+            column_labels = ["Dígito", "Frecuencia", "% Real", "% Benford"]
+            table = plt.table(
+                cellText=tabla_data,
+                colLabels=column_labels,
+                colColours=["lightblue"] * 4,
+                cellLoc="center",
+                loc="right",
+                bbox=[1.05, 0.1, 0.45, 0.8]
+            )
+            
+            table.auto_set_font_size(False)
+            table.set_fontsize(8)
+            
+            # Ajustar layout
+            plt.tight_layout()
+            
+            # Guardar si se especificó archivo
+            if output_file:
+                plt.savefig(output_file, dpi=300, bbox_inches='tight')
+                print(f"✓ Gráfico guardado: {output_file}")
+            
+            # Mostrar si se solicitó
+            if show:
+                plt.show()
+            else:
+                plt.close()
+            
+            return True
+            
+        except Exception as e:
+            print(f"❌ Error generando gráfico: {e}")
+            return False
+    
+    def print_summary(self):
+        """Imprime un resumen del análisis"""
+        if not self.porcentajes_reales:
+            print("❌ No hay estadísticas para mostrar")
+            return
+        
+        print("\n" + "="*60)
+        print("ANÁLISIS DE LEY DE BENFORD")
+        print("="*60)
+        print(f"Total de muestras: {len(self.primeros_digitos)}")
+        print(f"Archivo: {os.path.basename(self.csv_file) if self.csv_file else 'N/A'}")
+        print("\n" + "-"*60)
+        print(f"{'Dígito':<10} {'Frecuencia':<15} {'% Real':<15} {'% Benford':<15}")
+        print("-"*60)
+        
+        for i in range(9):
+            print(f"{i+1:<10} {self.frecuencias_reales[i]:<15} "
+                  f"{self.porcentajes_reales[i]:<15.2f} {self.porcentajes_benford[i]:<15.2f}")
+        
+        print("-"*60)
+        print(f"{'TOTAL':<10} {sum(self.frecuencias_reales):<15} "
+              f"{sum(self.porcentajes_reales):<15.2f} {sum(self.porcentajes_benford):<15.2f}")
+        print("="*60)
+        
+        # Calcular desviación promedio
+        desviaciones = [abs(self.porcentajes_reales[i] - self.porcentajes_benford[i]) 
+                       for i in range(9)]
+        desviacion_promedio = sum(desviaciones) / len(desviaciones)
+        
+        print(f"\n📊 Desviación promedio de Benford: {desviacion_promedio:.2f}%")
+        
+        if desviacion_promedio < 2:
+            print("✓ Los datos se ajustan MUY BIEN a la Ley de Benford")
+        elif desviacion_promedio < 5:
+            print("✓ Los datos se ajustan BIEN a la Ley de Benford")
+        elif desviacion_promedio < 10:
+            print("⚠️ Los datos se ajustan MODERADAMENTE a la Ley de Benford")
+        else:
+            print("❌ Los datos NO se ajustan bien a la Ley de Benford")
+        print("="*60 + "\n")
+    
+    def analyze(self, csv_file=None, show_plot=True, save_plot=True):
+        """
+        Ejecuta el análisis completo
+        Args:
+            csv_file: Ruta al archivo CSV (si None, se pedirá seleccionar)
+            show_plot: Si True, muestra el gráfico
+            save_plot: Si True, guarda el gráfico como PNG
+        """
+        # Cargar datos
+        if csv_file:
+            if not self.load_csv(csv_file):
+                return False
+        elif not self.csv_file:
+            if not self.select_csv_file():
+                return False
+        
+        # Procesar
+        if not self.extract_first_digits():
+            return False
+        
+        if not self.calculate_statistics():
+            return False
+        
+        # Mostrar resumen
+        self.print_summary()
+        
+        # Generar gráfico
+        output_file = None
+        if save_plot and self.csv_file:
+            # Generar nombre de archivo de salida
+            base_name = Path(self.csv_file).stem
+            output_file = str(Path(self.csv_file).parent / f"{base_name}_benford_analysis.png")
+        
+        if not self.generate_plot(output_file=output_file, show=show_plot):
+            return False
+        
+        print("✅ Análisis completado exitosamente")
+        return True
+
+
+# ====================== FUNCIÓN PRINCIPAL ======================
+def analyze_csv_benford(csv_file=None, show_plot=True, save_plot=True):
+    """
+    Función conveniente para analizar un CSV
+    
+    Args:
+        csv_file: Ruta al archivo CSV (None para seleccionar manualmente)
+        show_plot: Mostrar gráfico en pantalla
+        save_plot: Guardar gráfico como PNG
+    
+    Returns:
+        BenfordAnalyzer: Instancia del analizador con los resultados
+    """
+    analyzer = BenfordAnalyzer()
+    analyzer.analyze(csv_file=csv_file, show_plot=show_plot, save_plot=save_plot)
+    return analyzer
+
+
+# ====================== USO INDEPENDIENTE ======================
+if __name__ == "__main__":
+    print("="*60)
+    print("ANALIZADOR DE LEY DE BENFORD")
+    print("="*60)
+    print("\nModo: Selección manual de archivo\n")
+    
+    # Uso como script independiente
+    analyzer = analyze_csv_benford(
+        csv_file=None,      # Pedirá seleccionar archivo
+        show_plot=True,     # Mostrará el gráfico
+        save_plot=True      # Guardará el gráfico como PNG
+    )
